@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "usart.h"
 #include "usb_device.h"
 #include "gpio.h"
 
@@ -87,6 +88,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USB_DEVICE_Init();
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -99,7 +101,9 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     uint8_t buffer[] = "Hello, World!\r\n";
-	CDC_Transmit_FS(buffer, sizeof(buffer));
+    CDC_Transmit_FS(buffer, sizeof(buffer));
+
+    HAL_UART_Transmit(&huart3, (const uint8_t*)"Hello from UART3\r\n", 18, HAL_MAX_DELAY);
 
     HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
     HAL_Delay(300);
