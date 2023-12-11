@@ -50,7 +50,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+extern DCMI_HandleTypeDef hdcmi;
+extern DMA_HandleTypeDef hdma_dcmi;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -99,7 +100,9 @@ int main(void)
   MX_I2C1_Init();
   MX_LPTIM1_Init();
   /* USER CODE BEGIN 2 */
-
+  OV7670_Init(&hdcmi, &hdma_dcmi, &hi2c1, &hlptim1);
+  OV7670_PowerUp();
+  //OV7670_UpdateSettings();
   /* USER CODE END 2 */
 
   /* Infinite loop */
