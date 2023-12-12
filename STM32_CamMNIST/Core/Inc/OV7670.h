@@ -11,12 +11,17 @@
 
 #include "stm32f7xx_hal.h"
 
-#define OV7670_RST_PORT		GPIOD
-#define OV7670_RST_PIN		GPIO_PIN_12
+//#define OV7670_RST_PORT		GPIOD
+//#define OV7670_RST_PIN		GPIO_PIN_12
+#define OV7670_RST_PORT		GPIOD       /* CAM_RST_GPIO_Port*/
+#define OV7670_RST_PIN		GPIO_PIN_0   /* CAM_RST_Pin */
 #define OV7670_PWDN_PORT	GPIOD
 #define OV7670_PWDN_PIN		GPIO_PIN_14
 #define OV7670_ADDR 		(0x42)
 #define OV7670_TIMEOUT 		1000
+
+//#define CAM_RST_Pin GPIO_PIN_0
+//#define CAM_RST_GPIO_Port GPIOD
 
 //-------------------------------------------------
 #define F_XCLK 		8 		// 8MHz set by LPTIM1

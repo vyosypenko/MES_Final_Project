@@ -18,9 +18,9 @@ static LPTIM_HandleTypeDef *sp_hlptim;
 
 static uint8_t capture_mode=0;
 static uint32_t img_address=0;
-static uint16_t img_width=320;
-static uint16_t img_height=240;
-static uint8_t img_format=YUV422;
+static uint16_t img_width=80;
+static uint16_t img_height=60;
+static uint8_t img_format=RGB565;
 
 static uint8_t mtx_yuv[]={0x80, 0x80, 0x00, 0x22, 0x5E, 0x80};
 static uint8_t mtx_rgb[]={0xB3, 0xB3, 0x00, 0x3D, 0xB0, 0xE4};
