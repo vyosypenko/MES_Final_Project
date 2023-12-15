@@ -61,8 +61,16 @@ void Error_Handler(void);
 #define CONS_UART_TX_GPIO_Port GPIOD
 #define CONS_UART_RX_Pin GPIO_PIN_9
 #define CONS_UART_RX_GPIO_Port GPIOD
+#define CAM_PWD_Pin GPIO_PIN_14
+#define CAM_PWD_GPIO_Port GPIOD
+#define CAM_nRST_Pin GPIO_PIN_0
+#define CAM_nRST_GPIO_Port GPIOD
 #define LD2_Pin GPIO_PIN_7
 #define LD2_GPIO_Port GPIOB
+#define CAM_SCL_Pin GPIO_PIN_8
+#define CAM_SCL_GPIO_Port GPIOB
+#define CAM_SDA_Pin GPIO_PIN_9
+#define CAM_SDA_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
