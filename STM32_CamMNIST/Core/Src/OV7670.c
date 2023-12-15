@@ -18,8 +18,10 @@ static LPTIM_HandleTypeDef *sp_hlptim;
 
 static uint8_t capture_mode=0;
 static uint32_t img_address=0;
-static uint16_t img_width=80;
-static uint16_t img_height=60;
+//static uint16_t img_width=80;
+//static uint16_t img_height=60;
+static uint16_t img_width=320;
+static uint16_t img_height=240;
 static uint8_t img_format=RGB565;
 
 static uint8_t mtx_yuv[]={0x80, 0x80, 0x00, 0x22, 0x5E, 0x80};
@@ -40,13 +42,13 @@ void OV7670_Power(uint8_t en)
 		HAL_GPIO_WritePin(OV7670_PWDN_PORT, OV7670_PWDN_PIN, GPIO_PIN_RESET);
 	else
 		HAL_GPIO_WritePin(OV7670_PWDN_PORT, OV7670_PWDN_PIN, GPIO_PIN_SET);
-	HAL_Delay(50);
+	HAL_Delay(100);
 }
 
 void OV7670_ResetHW(void)
 {
 	HAL_GPIO_WritePin(OV7670_RST_PORT, OV7670_RST_PIN, GPIO_PIN_RESET);
-	HAL_Delay(50);
+	HAL_Delay(100);
 	HAL_GPIO_WritePin(OV7670_RST_PORT, OV7670_RST_PIN, GPIO_PIN_SET);
 	HAL_Delay(50);
 }
@@ -67,8 +69,12 @@ void OV7670_WriteSCCB(uint8_t regAddr, uint8_t val)
 
 void OV7670_ReadSCCB(uint8_t regAddr, uint8_t *data)
 {
-	HAL_I2C_Master_Transmit(sp_hi2c, OV7670_ADDR, &regAddr, 1, OV7670_TIMEOUT);
-	HAL_I2C_Master_Receive(sp_hi2c, OV7670_ADDR, data, 1, OV7670_TIMEOUT);
+	HAL_StatusTypeDef ret;
+	do {
+		ret = HAL_I2C_Master_Transmit(sp_hi2c, OV7670_ADDR, &regAddr, 1, OV7670_TIMEOUT);
+		ret |= HAL_I2C_Master_Receive(sp_hi2c, OV7670_ADDR, data, 1, OV7670_TIMEOUT);
+	} while (ret != HAL_OK && 0);
+	HAL_Delay(5);
 }
 
 void OV7670_Start(Capture_mode mode, uint32_t *capture_address)
@@ -91,6 +97,17 @@ void OV7670_ResetSW(void)
 {
 	OV7670_WriteSCCB(REG_COM7, 0x80);
 	HAL_Delay(30);
+
+	// debug
+	uint8_t temp=0;
+	OV7670_ReadSCCB(0x01, &temp);
+
+    //uint8_t buffer[4];
+	//ov7670_read(0x0b, buffer);
+	//printf("[OV7670] dev id = %02X\n", buffer[0]);
+
+
+
 	OV7670_Config(defaults);
 	HAL_Delay(10);
 }
@@ -337,9 +354,9 @@ void OV7670_ShowColorBar(Camera_state en)
 	OV7670_ReadSCCB(REG_COM17, &temp);
 
 	if(en)
-		OV7670_WriteSCCB(REG_COM17, temp | 0x08);
+		OV7670_WriteSCCB(REG_SCALING_YSC, temp | 0x80);
 	else
-		OV7670_WriteSCCB(REG_COM17, temp & 0xF7);
+		OV7670_WriteSCCB(REG_SCALING_YSC, temp & 0x7F);
 }
 
 void OV7670_FlipHorizontal(Camera_state flipH)
