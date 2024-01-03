@@ -110,17 +110,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	run(); //run ml task
-
-	HAL_Delay(5000);
-
-    uint8_t buffer[] = "Hello, World!\r\n";
-    CDC_Transmit_FS(buffer, sizeof(buffer));
-
-    //HAL_UART_Transmit(&huart3, (const uint8_t*)"Hello from UART3\r\n", 18, HAL_MAX_DELAY);
-
-    HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-    //HAL_Delay(300);
+	run();
   }
   /* USER CODE END 3 */
 }

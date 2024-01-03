@@ -13,8 +13,19 @@ extern "C"
 {
 #endif
 
-void init();
-void run();
+typedef enum {
+	M_DEBUG,
+	M_RUN
+} run_mode_t;
+
+
+typedef enum  {
+	NO,
+	YES
+} data_ready_t;
+
+void init(void);
+void run(void);
 
 #ifdef __cplusplus
 }
