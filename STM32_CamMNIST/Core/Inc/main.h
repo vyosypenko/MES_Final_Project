@@ -57,6 +57,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define MODE_BNT_Pin GPIO_PIN_13
+#define MODE_BNT_GPIO_Port GPIOC
+#define LD3_Pin GPIO_PIN_14
+#define LD3_GPIO_Port GPIOB
 #define CONS_UART_TX_Pin GPIO_PIN_8
 #define CONS_UART_TX_GPIO_Port GPIOD
 #define CONS_UART_RX_Pin GPIO_PIN_9

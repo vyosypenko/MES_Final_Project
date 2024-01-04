@@ -83,35 +83,56 @@ void init(void)
     ei_printf("\x1b[2J\x1b[;H");
     ei_printf("Welcome to Embedded ML handwritten digits recognition system\r\n\r\n");
 
+    mode_button_init();
+
     camera_init(camera_buff, EI_CLASSIFIER_INPUT_WIDTH, EI_CLASSIFIER_INPUT_HEIGHT);
 }
+
+static uint32_t mode_trigger = 0;
+static run_mode_t app_mode = M_DEBUG;
 
 void run(void)
 {
     signal_t signal;
 
-    //ToDO: Add code to button check
+    if (get_mode_button_state())
+    {
+    	if (mode_trigger) {
+    		ei_printf("DEBUG MODE\r\n");
+    		mode_trigger = 0;
+    	}
+    	else {
+    		ei_printf("RUN MODE\r\n");
+    		ei_printf("Waiting for data from the camera ...\r\n");
+    		mode_trigger = 1;
+    	}
 
-    run_mode_t app_mode = M_RUN;
+    	reset_mode_button_state();
+    }
+
+    if (mode_trigger)
+    	app_mode = M_RUN;
+    else
+    	app_mode = M_DEBUG;
+
 
     switch (app_mode)
     {
     case M_DEBUG:
-        ei_printf("DEBUG MODE\r\n");
         signal.total_length = sizeof(test_features) / sizeof(test_features[0]);
         signal.get_data = &get_feature_data;
         HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+        led_debug_mode();
         run_inference(&signal);
         break;
 
     case M_RUN:
-        HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+    	led_run_mode();
         switch (get_camera_data_available_flag())
         {
         case NO:
             break;
         case YES:
-            ei_printf("RUN MODE\r\n");
             signal.total_length = EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE;
             signal.get_data = &get_camera_data;
             run_inference(&signal);
