@@ -19,6 +19,7 @@ using namespace ei;
 static uint8_t camera_buff[EI_CLASSIFIER_INPUT_WIDTH*EI_CLASSIFIER_INPUT_HEIGHT];
 static data_ready_t data_is_ready = NO;
 
+
 // Digit: 8: sample 37128(8)
 // paste the raw features here
 // section Raw data under Image tab
@@ -195,9 +196,9 @@ static void vprint(const char *fmt, va_list argp)
     char string[200];
     if(0 < vsprintf(string, fmt, argp)) // build string
     {
-    	//HAL_UART_Transmit(&huart3, (uint8_t*)string, strlen(string), HAL_MAX_DELAY);
-    	CDC_Transmit_FS((uint8_t*)string, strlen(string));
-    	HAL_Delay(1);
+        //HAL_UART_Transmit(&huart3, (uint8_t*)string, strlen(string), HAL_MAX_DELAY);
+        CDC_Transmit_FS((uint8_t*)string, strlen(string));
+        HAL_Delay(1);
     }
 }
 
@@ -216,19 +217,19 @@ static int get_feature_data(size_t offset, size_t length, float *out_ptr) {
 
 void init(void)
 {
-	HAL_Delay(500);
+    HAL_Delay(500);
     /* \x1b[2J\x1b[;H - ANSI ESC sequence for clear screen */
-	ei_printf("\x1b[2J\x1b[;H");
-	ei_printf("Welcome to Embedded ML handwritten digits recognition system\r\n\r\n");
-	HAL_UART_Receive_IT(&huart3, camera_buff, (EI_CLASSIFIER_INPUT_WIDTH * EI_CLASSIFIER_INPUT_HEIGHT));
+    ei_printf("\x1b[2J\x1b[;H");
+    ei_printf("Welcome to Embedded ML handwritten digits recognition system\r\n\r\n");
+    HAL_UART_Receive_IT(&huart3, camera_buff, (EI_CLASSIFIER_INPUT_WIDTH * EI_CLASSIFIER_INPUT_HEIGHT));
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	data_is_ready = YES;
+    data_is_ready = YES;
 
-	// Start next reading
-	HAL_UART_Receive_IT(&huart3, camera_buff, (EI_CLASSIFIER_INPUT_WIDTH * EI_CLASSIFIER_INPUT_HEIGHT));
+    // Start next reading
+    HAL_UART_Receive_IT(&huart3, camera_buff, (EI_CLASSIFIER_INPUT_WIDTH * EI_CLASSIFIER_INPUT_HEIGHT));
 }
 
 /**
@@ -244,30 +245,23 @@ static inline void mono_to_rgb(uint8_t mono_data, uint8_t *r, uint8_t *g, uint8_
     *r = *g = *b = v;
 }
 
+
+
+// Callback: fill a section of the out_ptr buffer when requested
 int get_camera_data(size_t offset, size_t length, float *out_ptr)
 {
-	size_t bytes_left = length;
-	size_t out_ptr_ix = 0;
-	uint8_t r, g, b;
+    uint8_t pixel;
+    float pixel_f;
 
-	// read byte for byte
-    while (bytes_left != 0)
+    // Loop through requested pixels, copy grayscale to RGB channels
+    for (size_t i = 0; i < length; i++)
     {
-        // grab the value and convert to r/g/b
-        uint8_t pixel = camera_buff[offset];
-
-        mono_to_rgb(pixel, &r, &g, &b);
-
-        // then convert to out_ptr format
-        float pixel_f = (r << 16) + (g << 8) + b;
-        out_ptr[out_ptr_ix] = pixel_f;
-
-
-		// and go to the next pixel
-		out_ptr_ix++;
-		bytes_left--;
+        pixel = (camera_buff + offset)[i];
+        pixel_f = (pixel << 16) + (pixel << 8) + pixel;
+        out_ptr[i] = pixel_f;
     }
-    return 0;
+
+    return EIDSP_OK;
 }
 
 
@@ -310,40 +304,40 @@ inline void run_inference(signal_t* signal)
 
 void run(void)
 {
-	signal_t signal;
+    signal_t signal;
 
-	//ToDO: Add code to button check
+    //ToDO: Add code to button check
 
-	run_mode_t app_mode = M_RUN;
+    run_mode_t app_mode = M_RUN;
 
-	switch (app_mode)
-	{
-	case M_DEBUG:
-	    ei_printf("DEBUG MODE\r\n");
-		signal.total_length = sizeof(features) / sizeof(features[0]);
-		signal.get_data = &get_feature_data;
-	    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-	    run_inference(&signal);
-		break;
+    switch (app_mode)
+    {
+    case M_DEBUG:
+        ei_printf("DEBUG MODE\r\n");
+        signal.total_length = sizeof(features) / sizeof(features[0]);
+        signal.get_data = &get_feature_data;
+        HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+        run_inference(&signal);
+        break;
 
-	case M_RUN:
-		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-		switch (data_is_ready)
-		{
-		case NO:
-			break;
-		case YES:
-			ei_printf("RUN MODE\r\n");
-			signal.total_length = EI_CLASSIFIER_INPUT_WIDTH * EI_CLASSIFIER_INPUT_HEIGHT;
-			signal.get_data = &get_camera_data;
-			run_inference(&signal);
-			data_is_ready = NO;
-			break;
-		}
-		break;
+    case M_RUN:
+        HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+        switch (data_is_ready)
+        {
+        case NO:
+            break;
+        case YES:
+            ei_printf("RUN MODE\r\n");
+            signal.total_length = EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE;
+            signal.get_data = &get_camera_data;
+            run_inference(&signal);
+            data_is_ready = NO;
+            break;
+        }
+        break;
 
-	default:
-		break;
-	}
+    default:
+        break;
+    }
 
 }
