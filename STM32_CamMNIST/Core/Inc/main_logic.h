@@ -19,11 +19,6 @@ typedef enum {
 } run_mode_t;
 
 
-typedef enum  {
-	NO,
-	YES
-} data_ready_t;
-
 void init(void);
 void run(void);
 
