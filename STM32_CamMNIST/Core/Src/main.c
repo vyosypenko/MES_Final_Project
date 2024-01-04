@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "crc.h"
+#include "tim.h"
 #include "usart.h"
 #include "usb_device.h"
 #include "gpio.h"
@@ -99,6 +100,7 @@ int main(void)
   MX_USB_DEVICE_Init();
   MX_USART3_UART_Init();
   MX_CRC_Init();
+  MX_TIM14_Init();
   /* USER CODE BEGIN 2 */
   init();
   /* USER CODE END 2 */

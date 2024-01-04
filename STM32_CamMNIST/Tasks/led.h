@@ -9,7 +9,8 @@
 #define LED_H_
 
 
-
+void led_debug_mode(void);
+void led_run_mode(void);
 
 
 #endif /* LED_H_ */

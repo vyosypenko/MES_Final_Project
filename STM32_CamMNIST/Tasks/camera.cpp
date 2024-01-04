@@ -13,7 +13,7 @@ static uint8_t camera_weight;
 static uint8_t camera_height;
 
 
-static volatile data_availible_t data_available = NO;
+static volatile data_availible_t data_available;
 
 data_availible_t get_camera_data_available_flag(void)
 {
@@ -34,6 +34,8 @@ void reset_camera_data_available_flag(void)
 
 void camera_init(uint8_t* camera_buff, uint8_t weight, uint8_t height)
 {
+	data_available = NO;
+
 	camera_buff_ptr = camera_buff;
 	camera_weight = weight;
 	camera_height = height;

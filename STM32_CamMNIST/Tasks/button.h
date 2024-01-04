@@ -11,7 +11,13 @@
 #include "main.h"
 #include "gpio.h"
 
-void button_init(void);
+typedef enum  {
+	RELEASED,
+	PRESSED
+} button_state_t;
 
+void mode_button_init(void);
+button_state_t get_mode_button_state(void);
+void reset_mode_button_state(void);
 
 #endif /* BUTTON_H_ */
